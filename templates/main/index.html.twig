@@ -1,31 +1,37 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello MainController!{% endblock %}
+{% block title %}Weather{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
 
-<div class="example-wrapper">
+<div class="container">
     <h1>Weather</h1>
-    {{ form(form) }}
+    {{ form_start(form) }}
+    {{ form_errors(form) }}
+    <div class="row">
+        <div class="col">
+            {{ form_row(form.city, {'attr': {'placeholder': 'City'} }) }}
+        </div>
+        <div class="col">
+            {{ form_row(form.search) }}
+        </div>
+    </div>
+    {{ form_end(form) }}
     {% if weather.cod is defined and weather.cod == 200 %}
-    <h3>{{ weather.name }}</h3>
-    <div class="weather-icon"><img src="http://openweathermap.org/img/w/{{ weather.weather.0.icon }}.png" alt="Weather icon"></div>
-    <ul>
-        <li>Temp: {{ weather.main.temp }} &deg;C</li>
-        <li>Sunrise: {{ weather.sys.sunrise|date("H:i") }}</li>
-        <li>Wind speed: {{ weather.wind.speed }} m/s</li>
-        <li>Wind Deg: {{ weather.wind.deg }} &deg;</li>
-    </ul>
-
-    <ul>
-        {% for day in forecast %}
-        <li>{{ day.date }}: {{ day.temp }} &deg;C</li>
-        {% endfor %}
-    </ul>
+        <div class="city-name">{{ weather.name }}</div>
+        <div class="row">
+            <div class="col-lg">
+                <div class="temp-main"><img src="http://openweathermap.org/img/w/{{ weather.weather.0.icon }}.png" alt="Weather icon">{{ weather.main.temp }} &deg;C</div>
+                <div>Sunrise: {{ weather.sys.sunrise|date("H:i") }}</div>
+                <div>Wind speed: {{ weather.wind.speed }} m/s</div>
+                <div>Wind direction: {{ weather.wind.direction }}</div>
+            </div>
+            <div class="col-lg">
+                {% for day in forecast %}
+                    <div class="temp">{{ day.temp }} &deg;C</div><p>{{ day.date|date("l (d.m)")}}</p>
+                {% endfor %}
+            </div>
+        </div>
     {% elseif weather.error is defined %}
         <p>{{ weather.error }}</p>
     {% endif %}
