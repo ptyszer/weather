@@ -47,13 +47,14 @@ class WeatherService
 
         if ($response->getStatusCode() == 200 && $response->getContent()) {
             $result = json_decode($response->getContent(), true);
+            $result['wind']['direction'] = $this->getDirection($result['wind']['deg']);
         } elseif ($response->getStatusCode() == 404) {
             $result = [
-                'error' => 'Nie znaleziono miasta.'
+                'error' => 'City not found.'
             ];
         } else {
             $result = [
-                'error' => 'Wystąpił błąd, spróbuj wyszukać ponownie.'
+                'error' => 'Error occured.'
             ];
         }
 
@@ -74,7 +75,7 @@ class WeatherService
             $content = json_decode($response->getContent(), true);
             for ($i = 1; $i <= 5; $i++) {
                 $result[] = [
-                    'date' => date("l d.m", $content['daily'][$i]['dt']),
+                    'date' => $content['daily'][$i]['dt'],
                     'temp' => $content['daily'][$i]['temp']['day']
                 ];
             }
@@ -83,4 +84,27 @@ class WeatherService
         return $result;
     }
 
+    private function getDirection($bearing)
+    {
+        $cardinalDirections = array(
+            'N' => array(337.5, 22.5),
+            'NE' => array(22.5, 67.5),
+            'E' => array(67.5, 112.5),
+            'SE' => array(112.5, 157.5),
+            'S' => array(157.5, 202.5),
+            'SW' => array(202.5, 247.5),
+            'W' => array(247.5, 292.5),
+            'NW' => array(292.5, 337.5)
+        );
+
+        foreach ($cardinalDirections as $dir => $angles)
+        {
+            if ($bearing >= $angles[0] && $bearing < $angles[1])
+            {
+                $direction = $dir;
+                break;
+            }
+        }
+        return $direction;
+    }
 }
